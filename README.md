@@ -57,23 +57,29 @@ Now, just say `!dc help` in the channel.  The bot should reply with a helpful de
 
 ## Troubleshooting
 
-### My bot is DMing me instead of replying in the channel
+### My bot is DMing me instead of replying in the channel!
 
 This happens when the bot doesn't have permission to speak in a channel.  Either the channel is private, or your server requires that members have a role to speak.
 
 Make sure the bot (or its role by the same name) has the "Send Messages" permission — either server-wide, or in the channel it's in.
 
-### My bot can't create channels
+### My bot can't create channels!
 
 Also a permissions problem.  Make sure the bot has the "Manage Channels" permission on the server.
 
-### Channels I create manually aren't being cleaned up
+### My bot is doing everything multiple times!
+
+Is it possible you actually have the bot running multiple times in different windows?  Each one will operate independently.
+
+If it's doing everything exactly **four** times, that probably means some code is crashing and it's retrying but failing each time.  Check the log output.
+
+### Channels I create manually aren't being cleaned up!
 
 During normal operation, the bot will only clean up channels it creates itself.  If you create a channel manually (as a Discord admin), it won't pay any attention to it.
 
 However, if the bot is restarted, it will notice the new channels and clean them up as normal (eventually).
 
-### Something else is broken
+### Something else is broken!
 
 If your problem is with the Discord side (setting up a bot or adjusting permissions), you can try asking on the [unofficial Discord API guild](https://discord.gg/2Bgn8nW).
 
