@@ -195,9 +195,20 @@ defmodule DynChan.Server do
 
   defp delete_channel(state, id) do
     channel = Enum.find(state.channels, &(&1.id == id))
-    log(:info, state, "Deleting channel: #{inspect(channel.name)}")
+    state = %State{state | channels: List.delete(state.channels, channel)}
 
-    %State{state | channels: List.delete(state.channels, channel)}
+    case Discord.delete_channel(id) do
+      {:ok, %{id: ^id}} ->
+        log(:info, state, "Deleted channel: #{inspect(channel.name)}")
+        state
+
+      error ->
+        log(:error, state, "Failed to delete channel #{inspect(channel.name)}: #{inspect(error)}")
+        # Add it back on, but mark it as active, so it gets
+        # the timeout refreshed.  We'll try removing it again later.
+        channels = [Channel.set_active(channel) | state.channels]
+        %State{state | channels: channels}
+    end
   end
 
   defp log(level, state, message) do
