@@ -40,7 +40,7 @@ mix run --no-halt
 to start your bot.  If you've already added the bot to your server, you should see something like this:
 
 ```
-02:28:17.599 [warn]  "Your server name": Can't find dynamic channel category.
+02:28:17.599 [warn]  "Your server name": Can't find category: "Dynamic Channels"
 
 02:28:17.600 [info]  "Your server name": Now monitoring; ID: 123456789012345678
 

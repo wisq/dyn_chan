@@ -127,19 +127,23 @@ defmodule DynChan.Server do
   end
 
   defp handle_create_channel(name, %State{category_id: nil} = state) do
+    cat_name = dynamic_category_name()
+
     result =
       Discord.create_guild_channel(state.id,
-        name: dynamic_category_name(),
+        name: cat_name,
         type: @type_category
       )
 
     case result do
       {:ok, channel} ->
+        log(:info, state, "Created category: #{inspect(channel.name)}")
         state = %State{state | category_id: channel.id}
         handle_create_channel(name, state)
 
-      {:error, _} = err ->
-        {err, state}
+      {:error, err} ->
+        log(:error, state, "Failed to create category #{inspect(cat_name)}: #{inspect(err)}).")
+        {{:error, err}, state}
     end
   end
 
@@ -153,12 +157,14 @@ defmodule DynChan.Server do
 
     case result do
       {:ok, channel} ->
+        log(:info, state, "Created channel: #{inspect(channel.name)}")
         channels = [Channel.from_discord(channel) | state.channels]
         state = %State{state | channels: channels}
         {{:ok, channel}, state}
 
-      {:error, _} = err ->
-        {err, state}
+      {:error, err} ->
+        log(:error, state, "Failed to create channel #{inspect(name)}: #{inspect(err)}).")
+        {{:error, err}, state}
     end
   end
 
@@ -187,7 +193,7 @@ defmodule DynChan.Server do
 
     case find_dynamic_category(channels) do
       nil ->
-        log(:warn, state, "Can't find dynamic channel category.")
+        log(:warn, state, "Can't find category: #{inspect(dynamic_category_name())}")
         {nil, []}
 
       cat ->
