@@ -118,6 +118,23 @@ defmodule DynChan.Server do
     {:reply, rval, state, next}
   end
 
+  defp handle_create_channel(name, %State{category_id: nil} = state) do
+    result =
+      Discord.create_guild_channel(state.id,
+        name: dynamic_category_name(),
+        type: @type_category
+      )
+
+    case result do
+      {:ok, channel} ->
+        state = %State{state | category_id: channel.id}
+        handle_create_channel(name, state)
+
+      {:error, _} = err ->
+        {err, state}
+    end
+  end
+
   defp handle_create_channel(name, %State{category_id: cat_id} = state) when is_integer(cat_id) do
     result =
       Discord.create_guild_channel(state.id,
@@ -170,8 +187,12 @@ defmodule DynChan.Server do
     end
   end
 
+  defp dynamic_category_name do
+    Application.get_env(:dyn_chan, :category, "Dynamic Channels")
+  end
+
   defp find_dynamic_category(channels) do
-    name = Application.get_env(:dyn_chan, :category, "Dynamic Channels")
+    name = dynamic_category_name()
 
     channels
     |> Enum.find(fn c -> c.type == @type_category && c.name == name end)
