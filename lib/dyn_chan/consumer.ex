@@ -2,7 +2,12 @@ defmodule DynChan.Consumer do
   require Logger
   use Nostrum.Consumer
 
-  alias DynChan.{VoiceStates, ServerSupervisor, Messages}
+  alias DynChan.{
+    VoiceStates,
+    ServerSupervisor,
+    Server,
+    Messages
+  }
 
   def start_link do
     Consumer.start_link(__MODULE__)
@@ -19,7 +24,7 @@ defmodule DynChan.Consumer do
 
   def handle_event({:VOICE_STATE_UPDATE, {voice_state}, _ws_state}) do
     VoiceStates.update_state(voice_state.guild_id, voice_state)
-    ServerSupervisor.poke(voice_state.guild_id)
+    Server.poke(voice_state.guild_id)
   end
 
   def handle_event({:MESSAGE_CREATE, {msg}, _ws_state}) do

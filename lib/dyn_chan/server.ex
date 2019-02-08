@@ -3,7 +3,7 @@ defmodule DynChan.Server do
   use GenServer
 
   alias Nostrum.Api, as: Discord
-  alias DynChan.VoiceStates
+  alias DynChan.{VoiceStates, ServerRegistry}
 
   # Discord channel types:
   @type_voice 2
@@ -76,11 +76,19 @@ defmodule DynChan.Server do
   end
 
   def start_link(server_id) when is_integer(server_id) do
-    GenServer.start_link(__MODULE__, server_id)
+    name = {:via, Registry, {ServerRegistry, server_id}}
+    GenServer.start_link(__MODULE__, server_id, name: name)
   end
 
-  def poke(pid) do
+  def poke(pid) when is_pid(pid) do
     GenServer.cast(pid, :poke)
+  end
+
+  def poke(server_id) when is_integer(server_id) do
+    case ServerRegistry.whereis(server_id) do
+      nil -> Logger.warn("Failed to poke server #{inspect(server_id)}: Not running.")
+      pid when is_pid(pid) -> poke(pid)
+    end
   end
 
   def create_channel(pid, name) do

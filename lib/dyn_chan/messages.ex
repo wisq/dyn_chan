@@ -1,7 +1,7 @@
 defmodule DynChan.Messages do
   require Logger
   alias Nostrum.Api, as: Discord
-  alias DynChan.{ServerSupervisor, Server}
+  alias DynChan.{ServerRegistry, Server}
 
   @help_text """
   Hello! :wave:  I'm a bot that creates dynamic voice channels.  Here's the commands I support:
@@ -32,12 +32,14 @@ defmodule DynChan.Messages do
   def message(_text, _msg), do: :noop
 
   defp with_server(msg, fun) do
-    case ServerSupervisor.whereis(msg.guild_id) do
+    case ServerRegistry.whereis(msg.guild_id) do
       pid when is_pid(pid) ->
         fun.(pid)
 
       nil ->
-        Logger.error("Not monitoring server #{inspect(msg.guild_id)}.")
+        Logger.error(
+          "Not monitoring server #{inspect(msg.guild_id)}; can't process #{inspect(msg.content)}."
+        )
 
         reply(
           msg,
