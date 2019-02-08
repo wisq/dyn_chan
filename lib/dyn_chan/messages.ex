@@ -21,15 +21,41 @@ defmodule DynChan.Messages do
     reply(msg, @help_text)
   end
 
+  def message("!dc " <> _, %{guild_id: nil} = msg) do
+    # Received an unknown command as a DM.
+    reply(
+      msg,
+      "Hi! :wave:  I'm a robot, beep boop! :robot:  If you want to know more, say `!dc help`."
+    )
+  end
+
   def message("!dc " <> _, msg) do
-    reply(msg, "I'm not sure what you're trying to do here.  Maybe try `!dc help` ?")
+    # Received an unknown command as a channel message.
+    # Fall through to the case below.
+    message("!dc", msg)
   end
 
   def message("!dc", msg) do
     reply(msg, "I'm not sure what you're trying to do here.  Maybe try `!dc help` ?")
   end
 
+  def message(text, %{guild_id: nil} = msg) do
+    # Received random text (no `!dc`) as a DM rather than a channel message.
+    # Try parsing it again with `!dc` prepended.
+    # However, BE CAREFUL OF LOOPS.  Our own messages will trigger this.
+    if msg.author.id != Nostrum.Cache.Me.get().id do
+      message("!dc " <> text, msg)
+    end
+  end
+
   def message(_text, _msg), do: :noop
+
+  defp with_server(%{guild_id: nil} = msg, _fun) do
+    reply(
+      msg,
+      "Oops, I'm not sure what server to run that on.  You'll need to enter that command in a channel on a Discord server, not as a DM to me."
+    )
+  end
 
   defp with_server(msg, fun) do
     case ServerRegistry.whereis(msg.guild_id) do
