@@ -1,18 +1,21 @@
 defmodule DynChan do
-  @moduledoc """
-  Documentation for DynChan.
-  """
+  require Logger
+  use Application
 
-  @doc """
-  Hello world.
+  @children [
+    DynChan.VoiceStates,
+    DynChan.ServerRegistry,
+    DynChan.ServerSupervisor,
+    DynChan.Consumer
+  ]
 
-  ## Examples
+  def start(_type, _args) do
+    Logger.info("DynChan starting.")
 
-      iex> DynChan.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(
+      @children,
+      strategy: :one_for_one,
+      name: DynChan.Supervisor
+    )
   end
 end
