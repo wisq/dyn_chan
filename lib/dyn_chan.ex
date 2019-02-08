@@ -4,7 +4,6 @@ defmodule DynChan do
 
   @children [
     DynChan.VoiceStates,
-    DynChan.ServerRegistry,
     DynChan.ServerSupervisor,
     DynChan.Consumer
   ]
