@@ -10,7 +10,7 @@ defmodule DynChan.Server do
   @type_category 4
 
   # If there's nothing to do, repeat the message every 5 minutes:
-  @default_timeout 10_000
+  @default_timeout 300_000
 
   defmodule Channel do
     @enforce_keys [:id, :name]

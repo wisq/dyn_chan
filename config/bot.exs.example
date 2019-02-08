@@ -1,16 +1,15 @@
-# vim: ft=elixir
 use Mix.Config
 
 config :nostrum,
   # Copy this from the bot user you created for your API application.
-  token: "your_discord_token",
+  token: "your discord token",
   # Unless you're serving a big server (or many of them),
   # you shouldn't need more than one shard.
   num_shards: 1
 
 config :dyn_chan,
-  # ALL voice channels under this category will be dynamically managed.
-  # (Don't set this to a category with channels you care about.)
+  # ALL VOICE CHANNELS under this category will be dynamically managed.
+  # (Don't set this to a category with channels you care about!)
   category: "Dynamic Channels",
-  # Timeout (in seconds) before deleting empty channels.
+  # Timeout (in seconds) before deleting empty channels:
   idle_timeout: 300
