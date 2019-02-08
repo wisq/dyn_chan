@@ -2,6 +2,8 @@
 
 DynChan is a Discord bot that dynamically creates voice channels on demand, then cleans them up when they sit unused for too long.
 
+To see this in action, check out the [demo video](https://raw.githubusercontent.com/wisq/dyn_chan/master/demo.mp4).  (This uses a 5-second idle timeout, which is absurdly short.)
+
 ## Discord setup
 
 To start, you'll need to create a Discord bot account:
