@@ -33,8 +33,8 @@ defmodule DynChan.Consumer do
 
   # Default event handler, if you don't include this, your consumer WILL crash if
   # you don't have a method definition for each event type.
-  def handle_event({type, _data, _ws_state}) do
-    Logger.debug("Consumer received unknown event type: #{type}")
+  def handle_event({_type, _data, _ws_state}) do
+    # Logger.debug("Consumer received unknown event type: #{type}")
     :noop
   end
 end
