@@ -2,7 +2,7 @@ defmodule DynChan.Consumer do
   require Logger
   use Nostrum.Consumer
 
-  alias DynChan.{VoiceStates, ServerSupervisor}
+  alias DynChan.{VoiceStates, ServerSupervisor, Messages}
 
   def start_link do
     Consumer.start_link(__MODULE__)
@@ -23,7 +23,7 @@ defmodule DynChan.Consumer do
   end
 
   def handle_event({:MESSAGE_CREATE, {msg}, _ws_state}) do
-    Logger.debug("Consumer message: #{inspect(msg.content)}")
+    Messages.message(msg.content, msg)
   end
 
   # Default event handler, if you don't include this, your consumer WILL crash if

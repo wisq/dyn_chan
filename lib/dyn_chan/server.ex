@@ -62,12 +62,12 @@ defmodule DynChan.Server do
   end
 
   defmodule State do
-    @enforce_keys [:id, :name, :category_id, :channels]
+    @enforce_keys [:id, :name]
     defstruct(
       id: nil,
       name: nil,
       category_id: nil,
-      channels: nil
+      channels: []
     )
 
     def log_name(state) do
@@ -83,28 +83,58 @@ defmodule DynChan.Server do
     GenServer.cast(pid, :poke)
   end
 
+  def create_channel(pid, name) do
+    GenServer.call(pid, {:create, name})
+  end
+
   @impl true
   def init(id) do
     Process.flag(:trap_exit, true)
 
     guild = Discord.get_guild!(id)
-    {category_id, channels} = init_dynamic_channels(id, guild.name)
 
     state = %State{
       id: id,
-      name: guild.name,
-      category_id: category_id,
-      channels: channels
+      name: guild.name
     }
 
-    Logger.info("#{inspect(state.name)}: Now monitoring; ID: #{inspect(id)}")
+    {category_id, channels} = init_dynamic_channels(id, state)
+    state = %State{state | category_id: category_id, channels: channels}
+
+    log(:info, state, "Now monitoring; ID: #{inspect(id)}")
     {next, state} = process_channels(state)
     {:ok, state, next}
   end
 
   @impl true
   def terminate(reason, state) do
-    Logger.info("#{inspect(state.name)}: No longer monitoring; reason: #{inspect(reason)}")
+    log(:info, state, "No longer monitoring; reason: #{inspect(reason)}")
+  end
+
+  @impl true
+  def handle_call({:create, name}, _from, state) do
+    {rval, state} = handle_create_channel(name, state)
+    {next, state} = process_channels(state)
+    {:reply, rval, state, next}
+  end
+
+  defp handle_create_channel(name, %State{category_id: cat_id} = state) when is_integer(cat_id) do
+    result =
+      Discord.create_guild_channel(state.id,
+        name: name,
+        type: @type_voice,
+        parent_id: cat_id
+      )
+
+    case result do
+      {:ok, channel} ->
+        channels = [Channel.from_discord(channel) | state.channels]
+        state = %State{state | channels: channels}
+        {{:ok, channel}, state}
+
+      {:error, _} = err ->
+        {err, state}
+    end
   end
 
   @impl true
@@ -127,12 +157,12 @@ defmodule DynChan.Server do
     {:noreply, state, next}
   end
 
-  defp init_dynamic_channels(id, name) do
+  defp init_dynamic_channels(id, state) do
     channels = Discord.get_guild_channels!(id)
 
     case find_dynamic_category(channels) do
       nil ->
-        Logger.warn("#{inspect(name)}: Can't find dynamic channel category.")
+        log(:warn, state, "Can't find dynamic channel category.")
         {nil, []}
 
       cat ->
@@ -165,7 +195,7 @@ defmodule DynChan.Server do
   end
 
   defp calculate_next(%State{channels: []} = state) do
-    Logger.info("#{inspect(state.name)}: No dynamic channels.")
+    log(:info, state, "No dynamic channels.")
     @default_timeout
   end
 

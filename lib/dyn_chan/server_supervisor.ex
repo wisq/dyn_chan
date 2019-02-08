@@ -30,7 +30,7 @@ defmodule DynChan.ServerSupervisor do
     end
   end
 
-  defp whereis(server_id) do
+  def whereis(server_id) do
     Supervisor.which_children(__MODULE__)
     |> Enum.find_value(fn {id, pid, _, _} -> id == server_id && pid end)
   end
