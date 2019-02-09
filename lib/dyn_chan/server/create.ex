@@ -1,9 +1,6 @@
 defmodule DynChan.Server.Create do
-  require Logger
-  use GenServer
-
   alias Nostrum.Api, as: Discord
-  alias DynChan.{VoiceStates, Constants}
+  alias DynChan.Constants
   alias DynChan.Server.{State, Channel}
   import DynChan.Server.Common
 
