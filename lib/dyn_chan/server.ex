@@ -177,7 +177,7 @@ defmodule DynChan.Server do
   end
 
   @impl true
-  def handle_continue(channel_id, state) do
+  def handle_continue(_, state) do
     state = update_channel_timeouts(state)
     {timeout, state} = process_next_channel(state)
     {:noreply, state, timeout}
