@@ -93,4 +93,4 @@ If none of that helps, you could try [filing an issue](../../issues).  However, 
 
 Copyright © 2019, Adrian Irving-Beer.
 
-DynChan is released under the [Apache 2 License](https://github.com/wisq/space_ex/blob/master/LICENSE) and is provided with **no warranty**.  In particular: I've done my best to keep things as simple and secure as possible, but it's still processing a lot of Discord messages from random users, so maybe don't go running this on your ultra-secure bank server or whatnot.
+DynChan is released under the [Apache 2 License](../../blob/master/LICENSE) and is provided with **no warranty**.  In particular: I've done my best to keep things as simple and secure as possible, but it's still processing a lot of Discord messages from random users, so maybe don't go running this on your ultra-secure bank server or whatnot.
